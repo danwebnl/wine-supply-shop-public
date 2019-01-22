@@ -1,0 +1,64 @@
+import Link from 'next/link';
+import { Mutation } from 'react-apollo';
+
+import NavStyles from './styles/NavStyles';
+import User from './User';
+import Signout from './SignOut';
+import { TOGGLE_CART_MUTATION } from './Cart';
+import CartCount from './CartCount';
+import { ICartItem } from './Cart';
+
+export interface IData {
+  me: {
+    cart: [ICartItem]
+  }
+}
+
+const Nav = () => (
+
+  <User>
+    {({ data }: { data: IData }) => {
+      const { me } = data;
+
+      return (
+        <NavStyles>
+          <Link href="/products">
+            <a>Shop</a>
+          </Link>
+          {me && (
+            <>
+              <Link href="/sell">
+                <a>Sell</a>
+              </Link>
+
+              <Link href="/orders">
+                <a>Orders</a>
+              </Link>
+              <Signout />
+              <Mutation mutation={TOGGLE_CART_MUTATION}>
+                {(toggleCart: any) => (
+                  <button onClick={toggleCart}>
+                    My Cart
+                  <CartCount count={me.cart.reduce((tally, cartItem) => tally + cartItem.quantity, 0)}></CartCount>
+                  </button>
+                )}
+              </Mutation>
+            </>
+          )}
+
+          {!me && (
+            <Link href="/signup">
+              <a>Sign In </a>
+            </Link>
+          )}
+
+
+        </NavStyles>
+      );
+    }}
+  </User>
+
+
+);
+
+export default Nav;
